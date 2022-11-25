@@ -13,7 +13,7 @@ type APIServer struct {
 	config *Config
 	logger *logrus.Logger
 	router *mux.Router
-	store  store.Store
+	store  *store.Store
 }
 
 // New ...
@@ -26,21 +26,36 @@ func New(config *Config) *APIServer {
 }
 
 // Start server
-func (s APIServer) Start() error {
+func (s *APIServer) Start() error {
 	if err := s.configureLogger(); err != nil {
 		return err
 	} // create logger
 
 	s.logger.Info("Server start...") // Test logger!
 
-	//if err := s.configureStore(); err != nil {
-	//	return err
-	//}
+	if err := s.configureStore(); err != nil {
+		return err
+	}
 
 	s.configureRouter() //
 
 	return http.ListenAndServe("localhost"+s.config.BindAddr, s.router)
 
+}
+
+// Router configuration
+func (s *APIServer) configureRouter() {
+	conn := s.router
+	conn.HandleFunc("/hello", s.handHello())
+}
+
+func (s *APIServer) configureStore() error {
+	st := store.New(s.config.Store)
+	if err := st.Open(); err != nil {
+		return err
+	}
+	s.store = st
+	return nil
 }
 
 // Logger configuration
@@ -51,12 +66,6 @@ func (s *APIServer) configureLogger() error {
 	}
 	s.logger.SetLevel(level)
 	return nil
-}
-
-// Router configuration
-func (s *APIServer) configureRouter() {
-	conn := s.router
-	conn.HandleFunc("/hello", s.handHello())
 }
 
 // Testing request

@@ -1,3 +1,5 @@
 bind_addr = ":8080"     #host address
 log_level = "debug"
-database_url = ""       #database URL
+
+[store]
+database_url = "host=localhost user=admin password=lillol000 dbname=restipa_dev sslmode=disable"       #database URL
