@@ -54,7 +54,9 @@ func (s *APIServer) configureStore() error {
 	if err := st.Open(); err != nil {
 		return err
 	}
+	st.Close()
 	s.store = st
+	//	fmt.Println(s.store.QueryRow("SELECT id FROM Customers"))
 	return nil
 }
 
